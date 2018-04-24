@@ -1,23 +1,24 @@
 import requests
+import unittest
+import datetime
+
+base_url = 'http://127.0.0.1:5000/{}'
 
 
-class Test():
-    def __init__(self):
-        self.base_url = 'http://127.0.0.1:5000/{}'
 
-    def api_add(self):
+class Test(unittest.TestCase):
+    def test_add(self):
         r = requests.post(
-            url=self.base_url.format('add'),
+            url=base_url.format('add'),
             data='{"value_array":[{"value":12},{"value":18},{"value":10}]}')
-        assert r.json().get('result') == 40
+        self.assertEqual(r.json().get('result'), 40)
 
-    def api_date(self):
-        import datetime
-        r = requests.get(url=self.base_url.format('date'))
-        assert r.json().get('date') == datetime.datetime.now().strftime(
-            '%Y-%m-%d')
+    def test_date(self):
+        r = requests.get(url=base_url.format('get_date'))
+        self.assertEqual(r.json().get('date'),
+                         datetime.datetime.now().strftime('%Y-%m-%d'))
 
-    def api_chat(self):
+    def test_chat(self):
         import json
         msgs = [
             '输入的句子中含有中文 “您好”，输出回复“您好，您吃了吗？”',
@@ -31,5 +32,9 @@ class Test():
         ]
         for x, y in zip(msgs, results):
             data = json.dumps({'msg': x})
-            r = requests.post(url=self.base_url.format('chat'), data=data)
-            assert r.json().get('result') == y
+            r = requests.post(url=base_url.format('chat'), data=data)
+            self.assertEqual(r.json().get('result'), y)
+
+
+if __name__ == '__main__':
+    unittest.main()
